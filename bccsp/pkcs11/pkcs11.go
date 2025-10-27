@@ -247,9 +247,22 @@ func (csp *Provider) GetKey(ski []byte) (bccsp.Key, error) {
 		return csp.BCCSP.GetKey(ski)
 	}
 
-	var key bccsp.Key = &ecdsaPublicKey{ski, pubKey}
-	if isPriv {
-		key = &ecdsaPrivateKey{ski, ecdsaPublicKey{ski, pubKey}}
+	var key bccsp.Key
+
+	switch pubKey := pubKey.(type) {
+	case *ecdsa.PublicKey:
+		key = &ecdsaPublicKey{ski, pubKey}
+		if isPriv {
+			key = &ecdsaPrivateKey{ski, ecdsaPublicKey{ski, pubKey}}
+		}
+	case ed25519.PublicKey:
+		ed25519Key := pubKey
+		key = &ed25519PublicKey{ski, &ed25519Key}
+		if isPriv {
+			key = &ed25519PrivateKey{ski, ed25519PublicKey{ski, &ed25519Key}}
+		}
+	default:
+		return nil, fmt.Errorf("Unsupported key type found in PKCS11 module")
 	}
 
 	csp.cacheKey(ski, key)
