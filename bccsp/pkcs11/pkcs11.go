@@ -967,7 +967,7 @@ func (csp *Provider) findKeyPairFromSKI(session pkcs11.SessionHandle, ski []byte
 // 00000030  93 d8 40 c3 d5 a6 b7 38  16 d2 35 0a 53 11 f9 51  |..@....8..5.S..Q|
 // 00000040  fc a7 16                                          |...|
 //
-// In the case of ed25519, SoftHSM returns a leading 0x32 byte after the 0x04
+// In the case of ed25519, SoftHSM returns a leading 0x20 byte after the 0x04
 // which indicates the length of the point (32 bytes):
 //
 // 00000000  04 20 9d 61 b1 9d ef fd  5c 4e 6c 9c f5 8c 2c 3f
