@@ -328,6 +328,21 @@ func TestECDSASign(t *testing.T) {
 	})
 }
 
+func TestED25519GetKeyBySKI(t *testing.T) {
+	csp, cleanup := newProvider(t, defaultOptions())
+	defer cleanup()
+
+	k, err := csp.KeyGen(&bccsp.ED25519KeyGenOpts{Temporary: false})
+	require.NoError(t, err)
+
+	k2, err := csp.GetKey(k.SKI())
+	require.NoError(t, err)
+
+	require.True(t, k2.Private(), "key should be private")
+	require.False(t, k2.Symmetric(), "key should be asymmetric")
+	require.Equalf(t, k.SKI(), k2.SKI(), "expected %x got %x", k.SKI(), k2.SKI())
+}
+
 func TestED25519Sign(t *testing.T) {
 	csp, cleanup := newProvider(t, defaultOptions())
 	csp.curve = oidEd25519
